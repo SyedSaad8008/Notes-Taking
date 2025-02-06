@@ -1,0 +1,358 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note Taking App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <header class="flex justify-between items-center py-4">
+            <h1 class="text-3xl font-bold text-gray-800">Note Taking App</h1>
+            <button id="addNoteButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                <i class="fas fa-plus"></i> Add Note
+            </button>
+        </header>
+        
+        <main>
+            <div id="noteGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- No notes available -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal -->
+    <div id="noteModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">What kind of notes you want to take?</h2>
+            <div class="flex flex-col space-y-4">
+                <button id="normalWritingButton" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Normal Writing</button>
+                <button id="blockWritingButton" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Block Writing</button>
+                <button class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Tabular</button>
+                <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Groups</button>
+            </div>
+            <button id="closeModalButton" class="mt-6 text-gray-500 hover:text-gray-700">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Normal Writing Note Modal -->
+    <div id="normalWritingModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Create a Normal Note</h2>
+            <form id="normalNoteForm">
+                <div class="mb-4">
+                    <label for="noteTitle" class="block text-gray-700">Title</label>
+                    <input type="text" id="noteTitle" class="w-full px-3 py-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label for="noteContent" class="block text-gray-700">Content</label>
+                    <textarea id="noteContent" class="w-full px-3 py-2 border rounded" rows="5" required></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
+                    <button type="button" id="closeNormalWritingModalButton" class="ml-2 text-gray-500 hover:text-gray-700">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Block Writing Note Modal -->
+    <div id="blockWritingModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Create a Block Note</h2>
+            <form id="blockNoteForm">
+                <div id="blockNoteContainer">
+                    <div class="mb-4">
+                        <label for="blockNoteTitle1" class="block text-gray-700">Title 1</label>
+                        <input type="text" id="blockNoteTitle1" class="w-full px-3 py-2 border rounded" required>
+                        <label for="blockNotePoints1" class="block text-gray-700 mt-2">Points</label>
+                        <textarea id="blockNotePoints1" class="w-full px-3 py-2 border rounded" rows="3" required></textarea>
+                    </div>
+                </div>
+                <button type="button" id="addBlockNoteSection" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">Add Another Title</button>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
+                    <button type="button" id="closeBlockWritingModalButton" class="ml-2 text-gray-500 hover:text-gray-700">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Note Modal -->
+    <div id="editNoteModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden">
+        <div class="bg-white p-6 rounded shadow-lg w-11/12 md:w-1/2 lg:w-1/3">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Edit Note</h2>
+            <form id="editNoteForm">
+                <div class="mb-4">
+                    <label for="editNoteTitle" class="block text-gray-700">Title</label>
+                    <input type="text" id="editNoteTitle" class="w-full px-3 py-2 border rounded" required>
+                </div>
+                <div class="mb-4">
+                    <label for="editNoteContent" class="block text-gray-700">Content</label>
+                    <textarea id="editNoteContent" class="w-full px-3 py-2 border rounded" rows="5" required></textarea>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
+                    <button type="button" id="closeEditNoteModalButton" class="ml-2 text-gray-500 hover:text-gray-700">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('addNoteButton').addEventListener('click', function() {
+            document.getElementById('noteModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeModalButton').addEventListener('click', function() {
+            document.getElementById('noteModal').classList.add('hidden');
+        });
+
+        document.getElementById('normalWritingButton').addEventListener('click', function() {
+            document.getElementById('noteModal').classList.add('hidden');
+            document.getElementById('normalWritingModal').classList.remove('hidden');
+        });
+
+        document.getElementById('blockWritingButton').addEventListener('click', function() {
+            document.getElementById('noteModal').classList.add('hidden');
+            document.getElementById('blockWritingModal').classList.remove('hidden');
+        });
+
+        document.getElementById('closeNormalWritingModalButton').addEventListener('click', function() {
+            document.getElementById('normalWritingModal').classList.add('hidden');
+        });
+
+        document.getElementById('closeBlockWritingModalButton').addEventListener('click', function() {
+            document.getElementById('blockWritingModal').classList.add('hidden');
+        });
+
+        document.getElementById('normalNoteForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const title = document.getElementById('noteTitle').value;
+            const content = document.getElementById('noteContent').value;
+
+            const note = {
+                id: Date.now(),
+                type: 'normal',
+                title: title,
+                content: content
+            };
+
+            saveNoteToLocalStorage(note);
+            addNoteToGrid(note);
+
+            document.getElementById('normalWritingModal').classList.add('hidden');
+            document.getElementById('normalNoteForm').reset();
+        });
+
+        document.getElementById('blockNoteForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const blockNoteContainer = document.getElementById('blockNoteContainer');
+            const titles = blockNoteContainer.querySelectorAll('input[type="text"]');
+            const points = blockNoteContainer.querySelectorAll('textarea');
+
+            const note = {
+                id: Date.now(),
+                type: 'block',
+                sections: []
+            };
+
+            titles.forEach((title, index) => {
+                note.sections.push({
+                    title: title.value,
+                    points: points[index].value.split('\n')
+                });
+            });
+
+            saveNoteToLocalStorage(note);
+            addNoteToGrid(note);
+
+            document.getElementById('blockWritingModal').classList.add('hidden');
+            document.getElementById('blockNoteForm').reset();
+            blockNoteContainer.innerHTML = `
+                <div class="mb-4">
+                    <label for="blockNoteTitle1" class="block text-gray-700">Title 1</label>
+                    <input type="text" id="blockNoteTitle1" class="w-full px-3 py-2 border rounded" required>
+                    <label for="blockNotePoints1" class="block text-gray-700 mt-2">Points</label>
+                    <textarea id="blockNotePoints1" class="w-full px-3 py-2 border rounded" rows="3" required></textarea>
+                </div>
+            `;
+        });
+
+        document.getElementById('addBlockNoteSection').addEventListener('click', function() {
+            const blockNoteContainer = document.getElementById('blockNoteContainer');
+            const sectionCount = blockNoteContainer.querySelectorAll('input[type="text"]').length + 1;
+            const newSection = document.createElement('div');
+            newSection.className = 'mb-4';
+            newSection.innerHTML = `
+                <label for="blockNoteTitle${sectionCount}" class="block text-gray-700">Title ${sectionCount}</label>
+                <input type="text" id="blockNoteTitle${sectionCount}" class="w-full px-3 py-2 border rounded" required>
+                <label for="blockNotePoints${sectionCount}" class="block text-gray-700 mt-2">Points</label>
+                <textarea id="blockNotePoints${sectionCount}" class="w-full px-3 py-2 border rounded" rows="3" required></textarea>
+            `;
+            blockNoteContainer.appendChild(newSection);
+        });
+
+        document.getElementById('closeEditNoteModalButton').addEventListener('click', function() {
+            document.getElementById('editNoteModal').classList.add('hidden');
+        });
+
+        function saveNoteToLocalStorage(note) {
+            const notes = JSON.parse(localStorage.getItem('notes')) || [];
+            notes.push(note);
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        function updateNoteInLocalStorage(updatedNote) {
+            let notes = JSON.parse(localStorage.getItem('notes')) || [];
+            notes = notes.map(note => note.id === updatedNote.id ? updatedNote : note);
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        function deleteNoteFromLocalStorage(noteId) {
+            let notes = JSON.parse(localStorage.getItem('notes')) || [];
+            notes = notes.filter(note => note.id !== noteId);
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        function addNoteToGrid(note) {
+            const noteGrid = document.getElementById('noteGrid');
+            const noteDiv = document.createElement('div');
+            noteDiv.className = 'bg-white p-4 rounded shadow';
+            noteDiv.dataset.noteId = note.id;
+
+            if (note.type === 'normal') {
+                noteDiv.innerHTML = `
+                    <h2 class="text-xl font-semibold text-gray-800">${note.title}</h2>
+                    <p class="text-gray-600 mt-2">${note.content}</p>
+                    <div class="flex justify-end mt-4">
+                        <button class="text-blue-500 hover:text-blue-600 mr-2 editButton">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="text-red-500 hover:text-red-600 deleteButton">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+            } else if (note.type === 'block') {
+                let sectionsHtml = '';
+                note.sections.forEach((section, index) => {
+                    sectionsHtml += `
+                        <div class="mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">${section.title}</h3>
+                            <ul class="list-disc list-inside text-gray-600 mt-2">
+                                ${section.points.map(point => `<li>${point}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                });
+
+                noteDiv.innerHTML = `
+                    ${sectionsHtml}
+                    <div class="flex justify-end mt-4">
+                        <button class="text-blue-500 hover:text-blue-600 mr-2 editButton">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="text-red-500 hover:text-red-600 deleteButton">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+            }
+
+            noteGrid.appendChild(noteDiv);
+
+            // Add event listeners for edit and delete buttons
+            noteDiv.querySelector('.editButton').addEventListener('click', function() {
+                if (note.type === 'normal') {
+                    document.getElementById('editNoteTitle').value = note.title;
+                    document.getElementById('editNoteContent').value = note.content;
+                    document.getElementById('editNoteModal').classList.remove('hidden');
+
+                    document.getElementById('editNoteForm').onsubmit = function(event) {
+                        event.preventDefault();
+                        note.title = document.getElementById('editNoteTitle').value;
+                        note.content = document.getElementById('editNoteContent').value;
+                        updateNoteInLocalStorage(note);
+                        noteDiv.querySelector('h2').textContent = note.title;
+                        noteDiv.querySelector('p').textContent = note.content;
+                        document.getElementById('editNoteModal').classList.add('hidden');
+                    };
+                } else if (note.type === 'block') {
+                    // Handle block note editing
+                    const blockNoteContainer = document.getElementById('blockNoteContainer');
+                    blockNoteContainer.innerHTML = '';
+                    note.sections.forEach((section, index) => {
+                        const newSection = document.createElement('div');
+                        newSection.className = 'mb-4';
+                        newSection.innerHTML = `
+                            <label for="blockNoteTitle${index + 1}" class="block text-gray-700">Title ${index + 1}</label>
+                            <input type="text" id="blockNoteTitle${index + 1}" class="w-full px-3 py-2 border rounded" value="${section.title}" required>
+                            <label for="blockNotePoints${index + 1}" class="block text-gray-700 mt-2">Points</label>
+                            <textarea id="blockNotePoints${index + 1}" class="w-full px-3 py-2 border rounded" rows="3" required>${section.points.join('\n')}</textarea>
+                        `;
+                        blockNoteContainer.appendChild(newSection);
+                    });
+
+                    document.getElementById('blockWritingModal').classList.remove('hidden');
+
+                    document.getElementById('blockNoteForm').onsubmit = function(event) {
+                        event.preventDefault();
+                        const titles = blockNoteContainer.querySelectorAll('input[type="text"]');
+                        const points = blockNoteContainer.querySelectorAll('textarea');
+
+                        note.sections = [];
+                        titles.forEach((title, index) => {
+                            note.sections.push({
+                                title: title.value,
+                                points: points[index].value.split('\n')
+                            });
+                        });
+
+                        updateNoteInLocalStorage(note);
+                        noteDiv.innerHTML = `
+                            ${note.sections.map(section => `
+                                <div class="mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800">${section.title}</h3>
+                                    <ul class="list-disc list-inside text-gray-600 mt-2">
+                                        ${section.points.map(point => `<li>${point}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            `).join('')}
+                            <div class="flex justify-end mt-4">
+                                <button class="text-blue-500 hover:text-blue-600 mr-2 editButton">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="text-red-500 hover:text-red-600 deleteButton">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        `;
+                        document.getElementById('blockWritingModal').classList.add('hidden');
+                    };
+                }
+            });
+
+            noteDiv.querySelector('.deleteButton').addEventListener('click', function() {
+                noteGrid.removeChild(noteDiv);
+                deleteNoteFromLocalStorage(note.id);
+            });
+        }
+
+        function loadNotesFromLocalStorage() {
+            const notes = JSON.parse(localStorage.getItem('notes')) || [];
+            notes.forEach(note => addNoteToGrid(note));
+        }
+
+        // Load notes when the page loads
+        window.onload = loadNotesFromLocalStorage;
+    </script>
+</body>
+</html>
